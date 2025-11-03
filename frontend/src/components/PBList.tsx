@@ -2,24 +2,34 @@ import { useEffect, useState } from "react";
 
 export function PBList() {
   const [powerbanks, setPowerbanks] = useState([]);
-  const [name, setName] = useState("")
-  const [brand, setBrand] = useState("")
-  const [batteryTime, setBatteryTime] = useState(0)
-  const [chargeDuration, setChargeDuration] = useState(0)
-  const [cost, setCost] = useState(0)
-  const [available, setAvailable] = useState(true)
+  const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
+  const [batteryTime, setBatteryTime] = useState(0);
+  const [chargeDuration, setChargeDuration] = useState(0);
+  const [cost, setCost] = useState(0);
+  const [available, setAvailable] = useState(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newPB = {
-        name: name,
-        brand: brand,
-        batteryTime: batteryTime,
-        chargeDuration: chargeDuration,
-        cost: cost,
-        available: available
+      name: name,
+      brand: brand,
+      battery_time: batteryTime,
+      charge_duration: chargeDuration,
+      cost: cost,
+      available: available,
+    };
+    try {
+      const response = await fetch("http://localhost:3000/powerbanks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newPB),
+      });
+      fetchPBs();
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
 
   const fetchPBs = async () => {
     try {
@@ -37,7 +47,103 @@ export function PBList() {
   return (
     <>
       <h2>Powerbank Add</h2>
-      <form onSubmit={handleSubmit}></form>
+      <form onSubmit={handleSubmit}>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <label >Name:</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>Brand:</label>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="brand"
+                  required
+                  value={brand}
+                  onChange={(e) => {
+                    setBrand(e.target.value);
+                  }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>Battery timer(h):</label>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  name="batteryTime"
+                  value={batteryTime}
+                  onChange={(e) => {
+                    setBatteryTime(parseInt(e.target.value));
+                  }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>Charge time(h):</label>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  name="chargeDuration"
+                  value={chargeDuration}
+                  onChange={(e) => {
+                    setChargeDuration(parseInt(e.target.value));
+                  }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>Cost(Ft):</label>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  name="cost"
+                  value={cost}
+                  onChange={(e) => {
+                    setCost(parseInt(e.target.value));
+                  }}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label >Available:</label>
+              </td>
+              <td>
+                <select name="available">
+                  <option onSelect={() => setAvailable(true)}>Available</option>
+                  <option onSelect={() => setAvailable(false)}>
+                    Unavailable
+                  </option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+              <button type="submit">New powerbank</button>
+      </form>
       <h2>Powerbanks</h2>
       <table className="table">
         <thead>
@@ -60,7 +166,7 @@ export function PBList() {
               <td>{powerbank.battery_time}</td>
               <td>{powerbank.charge_duration}</td>
               <td>{powerbank.cost}</td>
-              <td>{powerbank.available}</td>
+              <td>{powerbank.available ? "Available" : "Unavailable"}</td>
             </tr>
           ))}
         </tbody>

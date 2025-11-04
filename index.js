@@ -33,6 +33,25 @@ app.get("/powerbanks", async (req, res) => {
   }
 });
 
+app.delete("/powerbanks/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+        const [result] = await connection.query(
+            "DELETE FROM powerbanks WHERE id = ?",
+            [id]
+        );
+ 
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "A megadott ID-jű powerbank nem található." });
+        }
+ 
+        res.json({ message: "Powerbank sikeresen törölve." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Hiba történt a törlés során." });
+    }
+})
+
 // ✅ Új termék felvétele
 app.post("/powerbanks", async (req, res) => {
   const { name, brand, battery_time, charge_duration, cost, available } = req.body;
@@ -48,7 +67,7 @@ app.post("/powerbanks", async (req, res) => {
     const [result] = await connection.query(
       `INSERT INTO powerbanks (name, brand, battery_time, charge_duration, cost, available)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [name, brand, battery_time, charge_duration, cost, available ?? 1]
+      [name, brand, battery_time, charge_duration, cost, available]
     );
 
     res.status(201).json({ message: "Termék hozzáadva", id: result.insertId });

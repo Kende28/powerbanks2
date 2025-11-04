@@ -7,7 +7,7 @@ export function PBList() {
   const [batteryTime, setBatteryTime] = useState(0);
   const [chargeDuration, setChargeDuration] = useState(0);
   const [cost, setCost] = useState(0);
-  const [available, setAvailable] = useState(true);
+  const [available, setAvailable] = useState(1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,6 +31,18 @@ export function PBList() {
     }
   };
 
+  const handleDelete = async (powerbankId: number) => {
+    const res = await fetch(`http://localhost:3000/powerbanks/${powerbankId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    setPowerbanks(
+      powerbanks.filter((powerbank) => powerbank.id !== powerbankId)
+    );
+  };
+
   const fetchPBs = async () => {
     try {
       const res = await fetch("http://localhost:3000/powerbanks");
@@ -52,7 +64,7 @@ export function PBList() {
           <tbody>
             <tr>
               <td>
-                <label >Name:</label>
+                <label>Name:</label>
               </td>
               <td>
                 <input
@@ -129,20 +141,18 @@ export function PBList() {
             </tr>
             <tr>
               <td>
-                <label >Available:</label>
+                <label>Available:</label>
               </td>
               <td>
-                <select name="available">
-                  <option onSelect={() => setAvailable(true)}>Available</option>
-                  <option onSelect={() => setAvailable(false)}>
-                    Unavailable
-                  </option>
+                <select name="available" onChange={(e) => setAvailable(parseInt(e.target.value))}>
+                  <option value={1}>Available</option>
+                  <option value={0}>Unavailable</option>
                 </select>
               </td>
             </tr>
           </tbody>
         </table>
-              <button type="submit">New powerbank</button>
+        <button type="submit">New powerbank</button>
       </form>
       <h2>Powerbanks</h2>
       <table className="table">
@@ -167,6 +177,16 @@ export function PBList() {
               <td>{powerbank.charge_duration}</td>
               <td>{powerbank.cost}</td>
               <td>{powerbank.available ? "Available" : "Unavailable"}</td>
+              <td>
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleDelete(powerbank.id);
+                  }}
+                >
+                  ❌
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>

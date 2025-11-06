@@ -43,6 +43,84 @@ export function PBList() {
     );
   };
 
+  const handleAvailable = async (powerbankId: number) => {
+    const res = await fetch(
+      `http://localhost:3000/powerbanks/available/${powerbankId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    fetchPBs();
+  };
+
+  const handleUnavailable = async (powerbankId: number) => {
+    const res = await fetch(
+      `http://localhost:3000/powerbanks/unavailable/${powerbankId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    fetchPBs();
+  };
+
+  const handleCDurationIncrease = async (powerbankId: number) => {
+    const res = await fetch(
+      `http://localhost:3000/powerbanks/addcduration/${powerbankId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    fetchPBs();
+  };
+
+  const handleCDurationDecrease = async (powerbankId: number) => {
+    const res = await fetch(
+      `http://localhost:3000/powerbanks/removecduration/${powerbankId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    fetchPBs();
+  };
+
+  const handleBTimeIncrease = async (powerbankId: number) => {
+    const res = await fetch(
+      `http://localhost:3000/powerbanks/addbtime/${powerbankId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    fetchPBs();
+  };
+
+  const handleBTimeDecrease = async (powerbankId: number) => {
+    const res = await fetch(
+      `http://localhost:3000/powerbanks/removebtime/${powerbankId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (!res.ok) {
+      throw new Error(`Error: ${res.status}`);
+    }
+    fetchPBs();
+  };
+
   const fetchPBs = async () => {
     try {
       const res = await fetch("http://localhost:3000/powerbanks");
@@ -144,7 +222,10 @@ export function PBList() {
                 <label>Available:</label>
               </td>
               <td>
-                <select name="available" onChange={(e) => setAvailable(parseInt(e.target.value))}>
+                <select
+                  name="available"
+                  onChange={(e) => setAvailable(parseInt(e.target.value))}
+                >
                   <option value={1}>Available</option>
                   <option value={0}>Unavailable</option>
                 </select>
@@ -173,10 +254,62 @@ export function PBList() {
               <td>{powerbank.id}</td>
               <td>{powerbank.name}</td>
               <td>{powerbank.brand}</td>
-              <td>{powerbank.battery_time}</td>
-              <td>{powerbank.charge_duration}</td>
+              <td>{powerbank.battery_time}
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleBTimeIncrease(powerbank.id);
+                  }}
+                >
+                  ➕
+                </span>
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleBTimeDecrease(powerbank.id);
+                  }}
+                >
+                  ➖
+                </span>
+              </td>
+              <td>{powerbank.charge_duration}
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleCDurationIncrease(powerbank.id);
+                  }}
+                >
+                  ➕
+                </span>
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleCDurationDecrease(powerbank.id);
+                  }}
+                >
+                  ➖
+                </span>
+              </td>
               <td>{powerbank.cost}</td>
-              <td>{powerbank.available ? "Available" : "Unavailable"}</td>
+              <td>
+                {powerbank.available ? "Available" : "Unavailable"}
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleAvailable(powerbank.id);
+                  }}
+                >
+                  ✅
+                </span>
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleUnavailable(powerbank.id);
+                  }}
+                >
+                  ❎
+                </span>
+              </td>
               <td>
                 <span
                   style={{ cursor: "pointer" }}

@@ -8,6 +8,8 @@ export function PBList() {
   const [chargeDuration, setChargeDuration] = useState(0);
   const [cost, setCost] = useState(0);
   const [available, setAvailable] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredPBs, setFilteredPBs] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,11 +123,32 @@ export function PBList() {
     fetchPBs();
   };
 
+  const handleSearch = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    const filtered = powerbanks.filter(
+      (powerbanks) =>
+        powerbanks.name.toLowerCase().includes(term) ||
+        powerbanks.brand.toLowerCase().includes(term)
+    );
+    setFilteredPBs(filtered);
+  };
+
+  const handleSortPBs = async (key: string, direction: "asc" | "desc") => {
+    const sortedPBs = [...filteredPBs].sort((a, b) => {
+      if (a[key] > b[key]) return direction === "asc" ? -1 : 1;
+      if (a[key] < b[key]) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  };
+
   const fetchPBs = async () => {
     try {
       const res = await fetch("http://localhost:3000/powerbanks");
       const data = await res.json();
       setPowerbanks(data);
+      setFilteredPBs(data)
     } catch (error) {
       console.log(error);
     }
@@ -134,6 +157,7 @@ export function PBList() {
   useEffect(() => {
     fetchPBs();
   }, []);
+
   return (
     <>
       <h2>Powerbank Add</h2>
@@ -236,11 +260,27 @@ export function PBList() {
         <button type="submit">New powerbank</button>
       </form>
       <h2>Powerbanks</h2>
+      <form>
+        <input
+          type="text"
+          placeholder="Kereséshez írjon ide!"
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+      </form>
       <table className="table">
         <thead>
           <tr>
             <th scope="col">ID</th>
-            <th scope="col">Name</th>
+            <th scope="col">
+              Name{" "}
+              <span style={{ cursor: "pointer" }} onClick={() => {}}>
+                🔼
+              </span>{" "}
+              <span style={{ cursor: "pointer" }} onClick={() => {}}>
+                🔽
+              </span>
+            </th>
             <th scope="col">Brand</th>
             <th scope="col">Battery time</th>
             <th scope="col">Charge duration</th>
@@ -249,12 +289,13 @@ export function PBList() {
           </tr>
         </thead>
         <tbody>
-          {powerbanks.map((powerbank) => (
+          {filteredPBs.map((powerbank) => (
             <tr key={powerbank.id}>
               <td>{powerbank.id}</td>
               <td>{powerbank.name}</td>
               <td>{powerbank.brand}</td>
-              <td>{powerbank.battery_time}
+              <td>
+                {powerbank.battery_time}
                 <span
                   style={{ cursor: "pointer" }}
                   onClick={() => {
@@ -272,7 +313,8 @@ export function PBList() {
                   ➖
                 </span>
               </td>
-              <td>{powerbank.charge_duration}
+              <td>
+                {powerbank.charge_duration}
                 <span
                   style={{ cursor: "pointer" }}
                   onClick={() => {
